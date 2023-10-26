@@ -47,15 +47,41 @@ class DBProvider {
   }
 
   // READ
-  Future<List<Todo>> getStudents() async {
-    Database db = await this.database;
-    final List<Map<String, dynamic>> studentsMapList =
-        await db.query(todosTable);
-    final List<Todo> studentsList = [];
-    studentsMapList.forEach((studentMap) {
-      studentsList.add(Todo.fromMap(studentMap));
-    });
+  Future<List<Todo>> getTodos() async {
+    Database db = await database;
+    final List<Map<String, dynamic>> todosMapList = await db.query(todosTable);
+    final List<Todo> todosList = [];
+    for (var todoMap in todosMapList) {
+      todosList.add(Todo.fromMap(todoMap));
+    }
+    return todosList;
+  }
 
-    return studentsList;
+  // INSERT
+  Future<Todo> insertTodo(Todo todo) async {
+    Database db = await database;
+    todo.id = await db.insert(todosTable, todo.toMap());
+    return todo;
+  }
+
+  // UPDATE
+  Future<int> updateTodo(Todo todo) async {
+    Database db = await database;
+    return await db.update(
+      todosTable,
+      todo.toMap(),
+      where: '$columnId = ?',
+      whereArgs: [todo.id],
+    );
+  }
+
+  // DELETE
+  Future<int> deleteTodo(int? id) async {
+    Database db = await database;
+    return await db.delete(
+      todosTable,
+      where: '$columnId = ?',
+      whereArgs: [id],
+    );
   }
 }
