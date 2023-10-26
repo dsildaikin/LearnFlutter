@@ -14,9 +14,9 @@ class DBProvider {
   String todosTable = 'Todos';
   String columnId = 'id';
   String columnName = 'name';
-  String columnDate = 'date';
   String columnTime = 'time';
-  String columnImportance = 'importance';
+  String columnDate = 'date';
+  String columnImportanceDegree = 'importanceDegree';
   String columnNote = 'note';
   String columnCompleted = 'completed';
 
@@ -36,9 +36,9 @@ class DBProvider {
       'CREATE TABLE $todosTable('
       '$columnId INTEGER PRIMARY KEY AUTOINCREMENT, '
       '$columnName TEXT, '
-      '$columnDate TEXT, '
       '$columnTime TEXT, '
-      '$columnImportance TEXT, '
+      '$columnDate TEXT, '
+      '$columnImportanceDegree TEXT, '
       '$columnCompleted TEXT)',
     );
   }
