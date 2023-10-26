@@ -1,125 +1,215 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app_sqlite/db/database.dart';
+import 'package:todo_app_sqlite/model/todo.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'SQLite CRUD Demo',
+      home: TodoPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class TodoPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _TodoPageState createState() => _TodoPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _TodoPageState extends State<TodoPage> {
+  final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
+  final _todoNameController = TextEditingController();
 
-  void _incrementCounter() {
+  late Future<List<Todo>> _todosList;
+  late String _todoName;
+  bool isUpdate = false;
+  int? todoIdForUpdate;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTodoList();
+  }
+
+  updateTodoList() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _todosList = DBProvider.db.getTodos();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('SQLite CRUD Demo'),
+        centerTitle: true,
+        backgroundColor: Colors.black,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        children: <Widget>[
+          Form(
+            key: _formStateKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please Enter Todo Name';
+                      }
+                      if (value.trim() == "") {
+                        return "Only Space is Not Valid!!!";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _todoName = value!;
+                    },
+                    controller: _todoNameController,
+                    decoration: const InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.greenAccent,
+                            width: 2,
+                            style: BorderStyle.solid),
+                      ),
+                      labelText: "Todo Name",
+                      icon: Icon(
+                        Icons.people,
+                        color: Colors.black,
+                      ),
+                      fillColor: Colors.white,
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
+                child: Text(
+                  (isUpdate ? 'UPDATE' : 'ADD'),
+                ),
+                onPressed: () {
+                  if (isUpdate) {
+                    if (_formStateKey.currentState!.validate()) {
+                      _formStateKey.currentState!.save();
+                      DBProvider.db
+                          .updateTodo(Todo(todoIdForUpdate!, _todoName))
+                          .then((data) {
+                        setState(() {
+                          isUpdate = false;
+                        });
+                      });
+                    }
+                  } else {
+                    if (_formStateKey.currentState!.validate()) {
+                      _formStateKey.currentState!.save();
+                      DBProvider.db.insertTodo(Todo(null, _todoName));
+                    }
+                  }
+                  _todoNameController.text = '';
+                  updateTodoList();
+                },
+              ),
+              const Padding(
+                padding: EdgeInsets.all(10),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
+                child: Text(
+                  (isUpdate ? 'CANCEL UPDATE' : 'CLEAR'),
+                ),
+                onPressed: () {
+                  _todoNameController.text = '';
+                  setState(() {
+                    isUpdate = false;
+                    todoIdForUpdate = null; // null;
+                  });
+                },
+              ),
+            ],
+          ),
+          const Divider(
+            height: 5.0,
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _todosList,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return generateList(snapshot.data as List<Todo>);
+                }
+                if (snapshot.data == null ||
+                    (snapshot.data as List<Todo>).isEmpty) {
+                  return const Text('No Data Found');
+                }
+                return const CircularProgressIndicator();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SingleChildScrollView generateList(List<Todo> todos) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: DataTable(
+          columns: const [
+            DataColumn(
+              label: Text('NAME'),
+            ),
+            DataColumn(
+              label: Text('DELETE'),
             ),
           ],
+          rows: todos
+              .map(
+                (todo) => DataRow(cells: [
+                  DataCell(Text(todo.name), onTap: () {
+                    setState(() {
+                      isUpdate = true;
+                      todoIdForUpdate = todo.id;
+                    });
+                    _todoNameController.text = todo.name;
+                  }),
+                  DataCell(
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        DBProvider.db.deleteTodo(todo.id);
+                        updateTodoList();
+                      },
+                    ),
+                  ),
+                ]),
+              )
+              .toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
