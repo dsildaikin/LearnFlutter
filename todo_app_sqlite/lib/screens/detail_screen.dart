@@ -8,6 +8,22 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  final _nameController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _importanceDegreeController = TextEditingController();
+  final _noteController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _timeController.dispose();
+    _dateController.dispose();
+    _importanceDegreeController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +36,7 @@ class _DetailScreenState extends State<DetailScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             TextFormField(
+              controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Название',
                 hintText: 'Введите название',
@@ -33,6 +50,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              controller: _timeController,
               decoration: const InputDecoration(
                 labelText: 'Время',
                 hintText: 'Введите время',
@@ -46,6 +64,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              controller: _dateController,
               decoration: const InputDecoration(
                 labelText: 'Дата',
                 hintText: 'Введите дату',
@@ -59,6 +78,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              controller: _importanceDegreeController,
               decoration: const InputDecoration(
                 labelText: 'Степень важности',
                 hintText: 'Введите степень важности',
@@ -72,6 +92,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              controller: _noteController,
               maxLines: 3,
               decoration: const InputDecoration(
                 labelText: 'Примечание',
