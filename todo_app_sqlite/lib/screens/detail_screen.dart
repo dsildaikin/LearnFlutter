@@ -31,7 +31,6 @@ class _DetailScreenState extends State<DetailScreen> {
   final _todoNameController = TextEditingController();
   final _todoTimeController = TextEditingController();
   final _todoDateController = TextEditingController();
-  final _todoImportanceDegreeController = TextEditingController();
   final _todoNoteController = TextEditingController();
   final _todoCompletedController = TextEditingController();
 
@@ -46,7 +45,6 @@ class _DetailScreenState extends State<DetailScreen> {
     _todoNameController.dispose();
     _todoTimeController.dispose();
     _todoDateController.dispose();
-    _todoImportanceDegreeController.dispose();
     _todoNoteController.dispose();
     _todoCompletedController.dispose();
 
@@ -274,7 +272,6 @@ class _DetailScreenState extends State<DetailScreen> {
     _todoNameController.text = '';
     _todoTimeController.text = '';
     _todoDateController.text = '';
-    _todoImportanceDegreeController.text = '';
     _todoNoteController.text = '';
     _todoCompletedController.text = '';
 
