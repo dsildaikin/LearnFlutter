@@ -35,6 +35,12 @@ class _DetailScreenState extends State<DetailScreen> {
   final _todoNoteController = TextEditingController();
   final _todoCompletedController = TextEditingController();
 
+  final _todoNameFocus = FocusNode();
+  final _todoTimeFocus = FocusNode();
+  final _todoDateFocus = FocusNode();
+  final _todoImportanceDegreeFocus = FocusNode();
+  final _todoCompletedFocus = FocusNode();
+
   @override
   void dispose() {
     _todoNameController.dispose();
@@ -43,7 +49,22 @@ class _DetailScreenState extends State<DetailScreen> {
     _todoImportanceDegreeController.dispose();
     _todoNoteController.dispose();
     _todoCompletedController.dispose();
+
+    _todoNameFocus.dispose();
+    _todoTimeFocus.dispose();
+    _todoDateFocus.dispose();
+    _todoImportanceDegreeFocus.dispose();
+    _todoCompletedFocus.dispose();
     super.dispose();
+  }
+
+  void _fieldFocusChange(
+    BuildContext context,
+    FocusNode currentFocus,
+    FocusNode nextFocus,
+  ) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
   }
 
   @override
@@ -55,12 +76,16 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Form(
         key: _formStateKey,
-        autovalidateMode: AutovalidateMode.always,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
             TextFormField(
               controller: _todoNameController,
+              focusNode: _todoNameFocus,
+              autofocus: true,
+              onFieldSubmitted: (_) {
+                _fieldFocusChange(context, _todoNameFocus, _todoTimeFocus);
+              },
               decoration: const InputDecoration(
                 labelText: 'Название',
                 hintText: 'Введите название',
@@ -87,6 +112,10 @@ class _DetailScreenState extends State<DetailScreen> {
             const SizedBox(height: 10),
             TextFormField(
               controller: _todoTimeController,
+              focusNode: _todoTimeFocus,
+              onFieldSubmitted: (_) {
+                _fieldFocusChange(context, _todoTimeFocus, _todoDateFocus);
+              },
               decoration: const InputDecoration(
                 labelText: 'Время',
                 hintText: 'Введите время',
@@ -101,6 +130,14 @@ class _DetailScreenState extends State<DetailScreen> {
             const SizedBox(height: 10),
             TextFormField(
               controller: _todoDateController,
+              focusNode: _todoDateFocus,
+              onFieldSubmitted: (_) {
+                _fieldFocusChange(
+                  context,
+                  _todoDateFocus,
+                  _todoImportanceDegreeFocus,
+                );
+              },
               decoration: const InputDecoration(
                 labelText: 'Дата',
                 hintText: 'Введите дату',
@@ -114,6 +151,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField(
+              focusNode: _todoImportanceDegreeFocus,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.label_important),
@@ -121,6 +159,13 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
               items: _importanceDegrees.map((importanceDegree) {
                 return DropdownMenuItem(
+                  onTap: () {
+                    _fieldFocusChange(
+                      context,
+                      _todoImportanceDegreeFocus,
+                      _todoCompletedFocus,
+                    );
+                  },
                   value: importanceDegree,
                   child: Text(importanceDegree),
                 );
@@ -132,19 +177,6 @@ class _DetailScreenState extends State<DetailScreen> {
               },
               value: _selectedImportanceDegree,
             ),
-            // TextFormField(
-            //   controller: _todoImportanceDegreeController,
-            //   decoration: const InputDecoration(
-            //     labelText: 'Степень важности',
-            //     hintText: 'Введите степень важности',
-            //     prefixIcon: Icon(Icons.label_important),
-            //     suffixIcon: Icon(
-            //       Icons.delete_outline,
-            //       color: Colors.red,
-            //     ),
-            //     border: OutlineInputBorder(),
-            //   ),
-            // ),
             const SizedBox(height: 10),
             TextFormField(
               controller: _todoNoteController,
@@ -162,6 +194,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              focusNode: _todoCompletedFocus,
               controller: _todoCompletedController,
               decoration: const InputDecoration(
                 labelText: 'Статус',
