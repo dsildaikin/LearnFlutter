@@ -23,6 +23,9 @@ class _DetailScreenState extends State<DetailScreen> {
 
   bool isUpdate = false;
 
+  final _importanceDegrees = ['Очень важно', 'Важно', 'Не горит'];
+  String _selectedImportanceDegree = 'Важно';
+
   final _formStateKey = GlobalKey<FormState>();
 
   final _todoNameController = TextEditingController();
@@ -47,11 +50,12 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Детальная страница'),
+        title: const Text('Редактирование дела'),
         centerTitle: true,
       ),
       body: Form(
         key: _formStateKey,
+        autovalidateMode: AutovalidateMode.always,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
@@ -68,11 +72,11 @@ class _DetailScreenState extends State<DetailScreen> {
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
-                if (value == null) {
-                  return 'Please Enter Todo Name';
+                if (value!.isEmpty) {
+                  return 'Поле ввода не должно быть пустым!';
                 }
                 if (value.trim() == "") {
-                  return "Only Space is Not Valid!!!";
+                  return "Поле ввода не должно содержать только пробел!";
                 }
                 return null;
               },
@@ -109,19 +113,38 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            TextFormField(
-              controller: _todoImportanceDegreeController,
+            DropdownButtonFormField(
               decoration: const InputDecoration(
-                labelText: 'Степень важности',
-                hintText: 'Введите степень важности',
-                prefixIcon: Icon(Icons.label_important),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
                 border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.label_important),
+                labelText: 'Степень важности',
               ),
+              items: _importanceDegrees.map((importanceDegree) {
+                return DropdownMenuItem(
+                  value: importanceDegree,
+                  child: Text(importanceDegree),
+                );
+              }).toList(),
+              onChanged: (importanceDegree) {
+                setState(() {
+                  _selectedImportanceDegree = importanceDegree as String;
+                });
+              },
+              value: _selectedImportanceDegree,
             ),
+            // TextFormField(
+            //   controller: _todoImportanceDegreeController,
+            //   decoration: const InputDecoration(
+            //     labelText: 'Степень важности',
+            //     hintText: 'Введите степень важности',
+            //     prefixIcon: Icon(Icons.label_important),
+            //     suffixIcon: Icon(
+            //       Icons.delete_outline,
+            //       color: Colors.red,
+            //     ),
+            //     border: OutlineInputBorder(),
+            //   ),
+            // ),
             const SizedBox(height: 10),
             TextFormField(
               controller: _todoNoteController,
