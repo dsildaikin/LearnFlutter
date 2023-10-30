@@ -84,15 +84,17 @@ class _DetailScreenState extends State<DetailScreen> {
               onFieldSubmitted: (_) {
                 _fieldFocusChange(context, _todoNameFocus, _todoTimeFocus);
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Название',
                 hintText: 'Введите название',
-                prefixIcon: Icon(Icons.cases_rounded),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
+                prefixIcon: const Icon(Icons.cases_rounded),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    _todoNameController.clear();
+                  },
+                  child: const Icon(Icons.delete_outline, color: Colors.red),
                 ),
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value!.isEmpty) {
@@ -103,9 +105,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 }
                 return null;
               },
-              onSaved: (value) {
-                _todoName = value!;
-              },
+              onSaved: (value) => _todoName = value!,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -124,6 +124,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: OutlineInputBorder(),
               ),
+              onSaved: (value) => _todoTime = value!,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -146,6 +147,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: OutlineInputBorder(),
               ),
+              onSaved: (value) => _todoDate = value!,
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField(
@@ -171,6 +173,7 @@ class _DetailScreenState extends State<DetailScreen> {
               onChanged: (importanceDegree) {
                 setState(() {
                   _selectedImportanceDegree = importanceDegree as String;
+                  _todoImportanceDegree = importanceDegree;
                 });
               },
               value: _selectedImportanceDegree,
@@ -179,16 +182,19 @@ class _DetailScreenState extends State<DetailScreen> {
             TextFormField(
               controller: _todoNoteController,
               maxLines: 3,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Примечание',
                 hintText: 'Введите примечание',
                 prefixIcon: Icon(Icons.description),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    _todoNoteController.clear();
+                  },
+                  child: const Icon(Icons.delete_outline, color: Colors.red),
                 ),
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
+              onSaved: (value) => _todoNote = value!,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -204,6 +210,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: OutlineInputBorder(),
               ),
+              onSaved: (value) => _todoCompleted = value!,
             ),
             const SizedBox(height: 20),
             Row(
