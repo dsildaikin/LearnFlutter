@@ -19,8 +19,6 @@ class _DetailScreenState extends State<DetailScreen> {
   late String _todoNote;
   late String _todoCompleted;
 
-  late Future<List<Todo>> _todosList;
-
   bool isUpdate = false;
 
   final _importanceDegrees = ['Очень важно', 'Важно', 'Не горит'];
@@ -247,11 +245,11 @@ class _DetailScreenState extends State<DetailScreen> {
           Todo(
             todoIdForUpdate!,
             _todoName,
-            _todoTime,
-            _todoDate,
-            _todoImportanceDegree,
-            _todoNote,
-            _todoCompleted,
+            // _todoTime,
+            // _todoDate,
+            // _todoImportanceDegree,
+            // _todoNote,
+            // _todoCompleted,
           ),
         )
             .then((data) {
@@ -267,11 +265,11 @@ class _DetailScreenState extends State<DetailScreen> {
           Todo(
             null,
             _todoName,
-            _todoTime,
-            _todoDate,
-            _todoImportanceDegree,
-            _todoNote,
-            _todoCompleted,
+            // _todoTime,
+            // _todoDate,
+            // _todoImportanceDegree,
+            // _todoNote,
+            // _todoCompleted,
           ),
         );
       }
@@ -281,13 +279,6 @@ class _DetailScreenState extends State<DetailScreen> {
     _todoDateController.text = '';
     _todoNoteController.text = '';
     _todoCompletedController.text = '';
-
-    updateTodoList();
-  }
-
-  updateTodoList() {
-    setState(() {
-      _todosList = DBProvider.db.getTodos();
-    });
+    Navigator.pop(context);
   }
 }

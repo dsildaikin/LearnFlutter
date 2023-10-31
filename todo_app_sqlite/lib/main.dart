@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app_sqlite/screens/detail_screen.dart';
+import 'package:todo_app_sqlite/screens/todos_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -8,9 +8,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Ежедневник',
-      home: DetailScreen(),
+      home: TodosScreen(),
     );
   }
 }
