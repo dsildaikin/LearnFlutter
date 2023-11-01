@@ -245,7 +245,7 @@ class _DetailScreenState extends State<DetailScreen> {
           Todo(
             todoIdForUpdate!,
             _todoName,
-            // _todoTime,
+            _todoTime,
             // _todoDate,
             // _todoImportanceDegree,
             // _todoNote,
@@ -265,7 +265,7 @@ class _DetailScreenState extends State<DetailScreen> {
           Todo(
             null,
             _todoName,
-            // _todoTime,
+            _todoTime,
             // _todoDate,
             // _todoImportanceDegree,
             // _todoNote,

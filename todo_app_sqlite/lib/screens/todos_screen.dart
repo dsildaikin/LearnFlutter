@@ -63,38 +63,23 @@ class _TodosScreenState extends State<TodosScreen> {
     );
   }
 
-  SingleChildScrollView generateList(List<Todo> todos) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: DataTable(
-          columns: const [
-            DataColumn(
-              label: Text('NAME'),
+  generateList(List<Todo> todos) {
+    return ListView(
+      children: todos.map((todo) {
+        return Card(
+          child: ListTile(
+            title: Text(todo.name),
+            subtitle: Text('Сделать до: ${todo.time}'),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                DBProvider.db.deleteTodo(todo.id);
+                updateTodoList();
+              },
             ),
-            DataColumn(
-              label: Text('DELETE'),
-            ),
-          ],
-          rows: todos
-              .map(
-                (todo) => DataRow(cells: [
-                  DataCell(Text(todo.name)),
-                  DataCell(
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        DBProvider.db.deleteTodo(todo.id);
-                        updateTodoList();
-                      },
-                    ),
-                  ),
-                ]),
-              )
-              .toList(),
-        ),
-      ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
