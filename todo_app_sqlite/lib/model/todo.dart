@@ -1,22 +1,20 @@
 class Todo {
   int? id;
   late String name;
-
   late String time;
-
-  // late String date;
-  // late String importanceDegree;
-  // late String note;
-  // late String completed;
+  late String date;
+  late String importanceDegree;
+  late String note;
+  late String completed;
 
   Todo(
     this.id,
     this.name,
     this.time,
-    // this.date,
-    // this.importanceDegree,
-    // this.note,
-    // this.completed,
+    this.date,
+    this.importanceDegree,
+    this.note,
+    this.completed,
   );
 
   Map<String, dynamic> toMap() {
@@ -24,10 +22,10 @@ class Todo {
     map['id'] = id;
     map['name'] = name;
     map['time'] = time;
-    // map['date'] = date;
-    // map['importanceDegree'] = importanceDegree;
-    // map['note'] = note;
-    // map['completed'] = completed;
+    map['date'] = date;
+    map['importanceDegree'] = importanceDegree;
+    map['note'] = note;
+    map['completed'] = completed;
     return map;
   }
 
@@ -35,9 +33,9 @@ class Todo {
     id = map['id'];
     name = map['name'];
     time = map['time'];
-    // date = map['date'];
-    // importanceDegree = map['importanceDegree'];
-    // note = map['note'];
-    // completed = map['completed'];
+    date = map['date'];
+    importanceDegree = map['importanceDegree'];
+    note = map['note'];
+    completed = map['completed'];
   }
 }

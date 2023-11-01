@@ -39,6 +39,7 @@ class DBProvider {
       '$columnTime TEXT, '
       '$columnDate TEXT, '
       '$columnImportanceDegree TEXT, '
+      '$columnNote TEXT, '
       '$columnCompleted TEXT)',
     );
   }

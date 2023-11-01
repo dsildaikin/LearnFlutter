@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:todo_app_sqlite/db/database.dart';
 import 'package:todo_app_sqlite/model/todo.dart';
 
@@ -21,16 +22,16 @@ class _DetailScreenState extends State<DetailScreen> {
 
   bool isUpdate = false;
 
-  final _importanceDegrees = ['Очень важно', 'Важно', 'Не горит'];
-  String _selectedImportanceDegree = 'Важно';
-
   final _formStateKey = GlobalKey<FormState>();
 
-  final _todoNameController = TextEditingController();
-  final _todoTimeController = TextEditingController();
-  final _todoDateController = TextEditingController();
-  final _todoNoteController = TextEditingController();
-  final _todoCompletedController = TextEditingController();
+  final _todoNameController = TextEditingController(text: 'Сходить в магазин');
+  final _todoTimeController = TextEditingController(text: '12:10');
+  final _todoDateController = TextEditingController(text: '03.11.23');
+  final _todoImportanceDegreeController =
+      TextEditingController(text: 'Не срочно');
+  final _todoNoteController =
+      TextEditingController(text: 'По пути прогуляться в парке');
+  final _todoCompletedController = TextEditingController(text: 'Выполняется');
 
   final _todoNameFocus = FocusNode();
   final _todoTimeFocus = FocusNode();
@@ -43,6 +44,7 @@ class _DetailScreenState extends State<DetailScreen> {
     _todoNameController.dispose();
     _todoTimeController.dispose();
     _todoDateController.dispose();
+    _todoImportanceDegreeController.dispose();
     _todoNoteController.dispose();
     _todoCompletedController.dispose();
 
@@ -94,6 +96,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: const OutlineInputBorder(),
               ),
+              inputFormatters: [LengthLimitingTextInputFormatter(30)],
+              onSaved: (value) => _todoName = value!,
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Поле ввода не должно быть пустым!';
@@ -103,7 +107,6 @@ class _DetailScreenState extends State<DetailScreen> {
                 }
                 return null;
               },
-              onSaved: (value) => _todoName = value!,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -122,7 +125,18 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.datetime,
+              inputFormatters: [LengthLimitingTextInputFormatter(5)],
               onSaved: (value) => _todoTime = value!,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Поле ввода не должно быть пустым!';
+                }
+                if (value.trim() == "") {
+                  return "Поле ввода не должно содержать только пробел!";
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -145,36 +159,42 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.datetime,
+              inputFormatters: [LengthLimitingTextInputFormatter(10)],
               onSaved: (value) => _todoDate = value!,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Поле ввода не должно быть пустым!';
+                }
+                if (value.trim() == "") {
+                  return "Поле ввода не должно содержать только пробел!";
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 10),
-            DropdownButtonFormField(
+            TextFormField(
+              controller: _todoImportanceDegreeController,
               focusNode: _todoImportanceDegreeFocus,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.label_important),
-                labelText: 'Степень важности',
-              ),
-              items: _importanceDegrees.map((importanceDegree) {
-                return DropdownMenuItem(
-                  onTap: () {
-                    _fieldFocusChange(
-                      context,
-                      _todoImportanceDegreeFocus,
-                      _todoCompletedFocus,
-                    );
-                  },
-                  value: importanceDegree,
-                  child: Text(importanceDegree),
+              onFieldSubmitted: (_) {
+                _fieldFocusChange(
+                  context,
+                  _todoImportanceDegreeFocus,
+                  _todoCompletedFocus,
                 );
-              }).toList(),
-              onChanged: (importanceDegree) {
-                setState(() {
-                  _selectedImportanceDegree = importanceDegree as String;
-                  _todoImportanceDegree = importanceDegree;
-                });
               },
-              value: _selectedImportanceDegree,
+              decoration: const InputDecoration(
+                labelText: 'Степень важности',
+                hintText: 'Введите степень важности',
+                prefixIcon: Icon(Icons.label_important),
+                suffixIcon: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                ),
+                border: OutlineInputBorder(),
+              ),
+              onSaved: (value) => _todoImportanceDegree = value!,
+              inputFormatters: [LengthLimitingTextInputFormatter(11)],
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -193,6 +213,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 border: const OutlineInputBorder(),
               ),
               onSaved: (value) => _todoNote = value!,
+              inputFormatters: [LengthLimitingTextInputFormatter(50)],
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -209,6 +230,16 @@ class _DetailScreenState extends State<DetailScreen> {
                 border: OutlineInputBorder(),
               ),
               onSaved: (value) => _todoCompleted = value!,
+              inputFormatters: [LengthLimitingTextInputFormatter(11)],
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Поле ввода не должно быть пустым!';
+                }
+                if (value.trim() == "") {
+                  return "Поле ввода не должно содержать только пробел!";
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 20),
             Row(
@@ -246,10 +277,10 @@ class _DetailScreenState extends State<DetailScreen> {
             todoIdForUpdate!,
             _todoName,
             _todoTime,
-            // _todoDate,
-            // _todoImportanceDegree,
-            // _todoNote,
-            // _todoCompleted,
+            _todoDate,
+            _todoImportanceDegree,
+            _todoNote,
+            _todoCompleted,
           ),
         )
             .then((data) {
@@ -266,19 +297,21 @@ class _DetailScreenState extends State<DetailScreen> {
             null,
             _todoName,
             _todoTime,
-            // _todoDate,
-            // _todoImportanceDegree,
-            // _todoNote,
-            // _todoCompleted,
+            _todoDate,
+            _todoImportanceDegree,
+            _todoNote,
+            _todoCompleted,
           ),
         );
+        _todoNameController.text = '';
+        _todoTimeController.text = '';
+        _todoDateController.text = '';
+        _todoImportanceDegreeController.text = '';
+        _todoNoteController.text = '';
+        _todoCompletedController.text = '';
+
+        Navigator.pop(context);
       }
     }
-    _todoNameController.text = '';
-    _todoTimeController.text = '';
-    _todoDateController.text = '';
-    _todoNoteController.text = '';
-    _todoCompletedController.text = '';
-    Navigator.pop(context);
   }
 }

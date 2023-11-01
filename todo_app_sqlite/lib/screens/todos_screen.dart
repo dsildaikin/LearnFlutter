@@ -68,8 +68,15 @@ class _TodosScreenState extends State<TodosScreen> {
       children: todos.map((todo) {
         return Card(
           child: ListTile(
-            title: Text(todo.name),
-            subtitle: Text('Сделать до: ${todo.time}'),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Название: ${todo.name}'),
+                Text('Сделать до: ${todo.time} ${todo.date}'),
+                Text('Степень важности: ${todo.importanceDegree}'),
+              ],
+            ),
+            subtitle: Text('Примечание: ${todo.note}'),
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
