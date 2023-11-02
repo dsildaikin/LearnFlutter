@@ -12,6 +12,7 @@ class TodosScreen extends StatefulWidget {
 
 class _TodosScreenState extends State<TodosScreen> {
   late Future<List<Todo>> _todosList;
+  bool isUpdate = false;
 
   @override
   void initState() {
@@ -33,12 +34,12 @@ class _TodosScreenState extends State<TodosScreen> {
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.of(context)
               .push(
             MaterialPageRoute(
-              builder: (context) => DetailScreen(),
+              builder: (context) => DetailScreen(isUpdate: isUpdate),
             ),
           )
               .then((value) {
@@ -67,23 +68,57 @@ class _TodosScreenState extends State<TodosScreen> {
     return ListView(
       children: todos.map((todo) {
         return Card(
-          child: ListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Название: ${todo.name}'),
-                Text('Сделать до: ${todo.time} ${todo.date}'),
-                Text('Степень важности: ${todo.importanceDegree}'),
-              ],
-            ),
-            subtitle: Text('Примечание: ${todo.note}'),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                DBProvider.db.deleteTodo(todo.id);
-                updateTodoList();
-              },
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text('Название: ${todo.name}'),
+                    const SizedBox(height: 5),
+                    Text('Сделать до: ${todo.time} ${todo.date}'),
+                    const SizedBox(height: 5),
+                    Text('Степень важности: ${todo.importanceDegree}'),
+                    const SizedBox(height: 5),
+                    Text('Статус: ${todo.completed}'),
+                    const SizedBox(height: 20),
+                    Text('Примечание: ${todo.note}'),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        DBProvider.db.deleteTodo(todo.id);
+                        updateTodoList();
+                      }),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailScreen(isUpdate: true, todo: todo)))
+                          .then((value) {
+                        setState(() {
+                          _todosList = DBProvider.db.getTodos();
+                        });
+                      });
+                    },
+                  ),
+                ],
+              )
+            ],
           ),
         );
       }).toList(),

@@ -4,15 +4,16 @@ import 'package:todo_app_sqlite/db/database.dart';
 import 'package:todo_app_sqlite/model/todo.dart';
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key});
+  DetailScreen({super.key, required this.isUpdate, this.todo});
+
+  Todo? todo;
+  bool isUpdate;
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  int? todoIdForUpdate;
-
   late String _todoName;
   late String _todoTime;
   late String _todoDate;
@@ -20,18 +21,14 @@ class _DetailScreenState extends State<DetailScreen> {
   late String _todoNote;
   late String _todoCompleted;
 
-  bool isUpdate = false;
-
   final _formStateKey = GlobalKey<FormState>();
 
-  final _todoNameController = TextEditingController(text: 'Сходить в магазин');
-  final _todoTimeController = TextEditingController(text: '12:10');
-  final _todoDateController = TextEditingController(text: '03.11.23');
-  final _todoImportanceDegreeController =
-      TextEditingController(text: 'Не срочно');
-  final _todoNoteController =
-      TextEditingController(text: 'По пути прогуляться в парке');
-  final _todoCompletedController = TextEditingController(text: 'Выполняется');
+  final _todoNameController = TextEditingController();
+  final _todoTimeController = TextEditingController();
+  final _todoDateController = TextEditingController();
+  final _todoImportanceDegreeController = TextEditingController();
+  final _todoNoteController = TextEditingController();
+  final _todoCompletedController = TextEditingController();
 
   final _todoNameFocus = FocusNode();
   final _todoTimeFocus = FocusNode();
@@ -65,11 +62,25 @@ class _DetailScreenState extends State<DetailScreen> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
+  void _textFieldsValue() {
+    _todoNameController.text =
+        widget.isUpdate ? widget.todo!.name : 'Сходить в магазин';
+    _todoTimeController.text = widget.isUpdate ? widget.todo!.time : '12:30';
+    _todoDateController.text = widget.isUpdate ? widget.todo!.date : '03.11.23';
+    _todoImportanceDegreeController.text =
+        widget.isUpdate ? widget.todo!.importanceDegree : 'Важно';
+    _todoNoteController.text =
+        widget.isUpdate ? widget.todo!.note : 'По пути прогуляться по парку';
+    _todoCompletedController.text =
+        widget.isUpdate ? widget.todo!.completed : 'Выполняется';
+  }
+
   @override
   Widget build(BuildContext context) {
+    _textFieldsValue();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Редактирование дела'),
+        title: Text(widget.isUpdate ? 'Изменение дела' : 'Добавление дела'),
         centerTitle: true,
       ),
       body: Form(
@@ -85,17 +96,15 @@ class _DetailScreenState extends State<DetailScreen> {
                 _fieldFocusChange(context, _todoNameFocus, _todoTimeFocus);
               },
               decoration: InputDecoration(
-                labelText: 'Название',
-                hintText: 'Введите название',
-                prefixIcon: const Icon(Icons.cases_rounded),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    _todoNameController.clear();
-                  },
-                  child: const Icon(Icons.delete_outline, color: Colors.red),
-                ),
-                border: const OutlineInputBorder(),
-              ),
+                  labelText: 'Название',
+                  hintText: 'Введите название',
+                  prefixIcon: const Icon(Icons.cases_rounded),
+                  suffixIcon: IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () {
+                        _todoNameController.clear();
+                      }),
+                  border: const OutlineInputBorder()),
               inputFormatters: [LengthLimitingTextInputFormatter(30)],
               onSaved: (value) => _todoName = value!,
               validator: (value) {
@@ -115,15 +124,16 @@ class _DetailScreenState extends State<DetailScreen> {
               onFieldSubmitted: (_) {
                 _fieldFocusChange(context, _todoTimeFocus, _todoDateFocus);
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Время',
                 hintText: 'Введите время',
-                prefixIcon: Icon(Icons.access_time_outlined),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.access_time_outlined),
+                suffixIcon: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _todoTimeController.clear();
+                    }),
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.datetime,
               inputFormatters: [LengthLimitingTextInputFormatter(5)],
@@ -149,15 +159,16 @@ class _DetailScreenState extends State<DetailScreen> {
                   _todoImportanceDegreeFocus,
                 );
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Дата',
                 hintText: 'Введите дату',
-                prefixIcon: Icon(Icons.calendar_month),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.calendar_month),
+                suffixIcon: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _todoDateController.clear();
+                    }),
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.datetime,
               inputFormatters: [LengthLimitingTextInputFormatter(10)],
@@ -183,18 +194,28 @@ class _DetailScreenState extends State<DetailScreen> {
                   _todoCompletedFocus,
                 );
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Степень важности',
                 hintText: 'Введите степень важности',
-                prefixIcon: Icon(Icons.label_important),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.label_important),
+                suffixIcon: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _todoImportanceDegreeController.clear();
+                    }),
+                border: const OutlineInputBorder(),
               ),
               onSaved: (value) => _todoImportanceDegree = value!,
               inputFormatters: [LengthLimitingTextInputFormatter(11)],
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Поле ввода не должно быть пустым!';
+                }
+                if (value.trim() == "") {
+                  return "Поле ввода не должно содержать только пробел!";
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -203,13 +224,12 @@ class _DetailScreenState extends State<DetailScreen> {
               decoration: InputDecoration(
                 labelText: 'Примечание',
                 hintText: 'Введите примечание',
-                prefixIcon: Icon(Icons.description),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    _todoNoteController.clear();
-                  },
-                  child: const Icon(Icons.delete_outline, color: Colors.red),
-                ),
+                prefixIcon: const Icon(Icons.description),
+                suffixIcon: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _todoNoteController.clear();
+                    }),
                 border: const OutlineInputBorder(),
               ),
               onSaved: (value) => _todoNote = value!,
@@ -219,15 +239,16 @@ class _DetailScreenState extends State<DetailScreen> {
             TextFormField(
               focusNode: _todoCompletedFocus,
               controller: _todoCompletedController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Статус',
                 hintText: 'Введите статус дела',
-                prefixIcon: Icon(Icons.done),
-                suffixIcon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.done),
+                suffixIcon: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _todoCompletedController.clear();
+                    }),
+                border: const OutlineInputBorder(),
               ),
               onSaved: (value) => _todoCompleted = value!,
               inputFormatters: [LengthLimitingTextInputFormatter(11)],
@@ -250,10 +271,10 @@ class _DetailScreenState extends State<DetailScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
-                  child: const Text('Добавить'),
+                  child: Text(widget.isUpdate ? 'Изменить' : 'Добавить'),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _clearTodo,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
@@ -268,13 +289,12 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   void _addOrUpdateTodo() {
-    if (isUpdate) {
+    if (widget.isUpdate) {
       if (_formStateKey.currentState!.validate()) {
         _formStateKey.currentState!.save();
-        DBProvider.db
-            .updateTodo(
+        DBProvider.db.updateTodo(
           Todo(
-            todoIdForUpdate!,
+            widget.todo!.id,
             _todoName,
             _todoTime,
             _todoDate,
@@ -282,12 +302,8 @@ class _DetailScreenState extends State<DetailScreen> {
             _todoNote,
             _todoCompleted,
           ),
-        )
-            .then((data) {
-          setState(() {
-            isUpdate = false;
-          });
-        });
+        );
+        Navigator.pop(context);
       }
     } else {
       if (_formStateKey.currentState!.validate()) {
@@ -309,9 +325,17 @@ class _DetailScreenState extends State<DetailScreen> {
         _todoImportanceDegreeController.text = '';
         _todoNoteController.text = '';
         _todoCompletedController.text = '';
-
         Navigator.pop(context);
       }
     }
+  }
+
+  void _clearTodo() {
+    _todoNameController.text = '';
+    _todoTimeController.text = '';
+    _todoDateController.text = '';
+    _todoImportanceDegreeController.text = '';
+    _todoNoteController.text = '';
+    _todoCompletedController.text = '';
   }
 }

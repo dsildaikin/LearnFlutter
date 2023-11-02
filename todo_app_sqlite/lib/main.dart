@@ -11,9 +11,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(fontSize: 18.0),
+        ),
       ),
       title: 'Ежедневник',
-      home: TodosScreen(),
+      home: const TodosScreen(),
     );
   }
 }
