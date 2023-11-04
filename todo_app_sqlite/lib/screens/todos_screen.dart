@@ -13,6 +13,7 @@ class TodosScreen extends StatefulWidget {
 class _TodosScreenState extends State<TodosScreen> {
   late Future<List<Todo>> _todosList;
   bool isUpdate = false;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -24,6 +25,12 @@ class _TodosScreenState extends State<TodosScreen> {
     setState(() {
       _todosList = DBProvider.db.getTodos();
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,32 +56,65 @@ class _TodosScreenState extends State<TodosScreen> {
           });
         },
       ),
-      body: FutureBuilder(
-        future: _todosList,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return generateList(snapshot.data as List<Todo>);
-          }
-          if (snapshot.data == null || (snapshot.data as List<Todo>).isEmpty) {
-            return const Text('No Data Found');
-          }
-          return const CircularProgressIndicator();
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            SearchBar(
+              textStyle: MaterialStateProperty.all(
+                const TextStyle(fontSize: 18.0),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchController.text = value;
+                  _todosList =
+                      DBProvider.db.searchTodos(_searchController.text);
+                });
+              },
+              controller: _searchController,
+              leading: const Icon(Icons.search),
+            ),
+            const SizedBox(height: 30.0),
+            Expanded(
+              child: FutureBuilder(
+                future: _todosList,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return generateList(snapshot.data as List<Todo>);
+                  }
+                  if (snapshot.data == null ||
+                      (snapshot.data as List<Todo>).isEmpty) {
+                    return const Text('No Data Found');
+                  }
+                  return const CircularProgressIndicator();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   generateList(List<Todo> todos) {
     return ListView(
+      shrinkWrap: true,
+      physics: const ScrollPhysics(),
       children: todos.map((todo) {
-        return Card(
+        return Container(
+          margin: const EdgeInsets.only(bottom: 20.0),
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.green, width: 2),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
           child: Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
                     Text('Название: ${todo.name}'),
                     const SizedBox(height: 5),
                     Text('Сделать до: ${todo.time} ${todo.date}'),
@@ -98,6 +138,7 @@ class _TodosScreenState extends State<TodosScreen> {
                       onPressed: () {
                         DBProvider.db.deleteTodo(todo.id);
                         updateTodoList();
+                        _searchController.clear();
                       }),
                   IconButton(
                     icon: const Icon(

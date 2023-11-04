@@ -55,6 +55,20 @@ class DBProvider {
     return todosList;
   }
 
+  Future<List<Todo>> searchTodos(String keyword) async {
+    Database db = await database;
+    List<Map<String, dynamic>> todosMapList = await db.query(
+      todosTable,
+      where: '$columnName LIKE ?',
+      whereArgs: ['%$keyword%'],
+    );
+    final List<Todo> todosList = [];
+    for (var todoMap in todosMapList) {
+      todosList.add(Todo.fromMap(todoMap));
+    }
+    return todosList;
+  }
+
   // INSERT
   Future<Todo> insertTodo(Todo todo) async {
     Database db = await database;
